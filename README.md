@@ -1,5 +1,11 @@
 ### [Return to Portfolio Directory](https://remypstewart.github.io/)
 
+The digitization of traditional media outlets has facilitated the integration of natural language processing techniques to understand relevant social topics. For one of my dissertation chapters I will be examining how local newspapers reinforce cultural stereotypes around race, gender, and class that drives individual political preferences. There is a lack of preestablished data sets for regional newspapers compared to national level sources such as the New York Times or Google News corpus. Given that local media outlets influence policy opinions that regional residents can have a sizable influence over compared to national politics, I wanted to address this data source gap through compiling an original newspaper corpus. 
+
+I focused on the [San Francisco Chronicle](https://www.sfchronicle.com/) as the city’s major local newspaper as digitally archived on [Access World Database](https://www.newsbank.com/libraries/colleges-universities/solutions/access-world-news-research-collection-2021-edition) that I hold a subscription with through my Cornell University Library affiliation. A common issue within web scraping is having to automate the navigation of nested pages, such as articles stored within the hierarchy of a collection of links for a particular day within a year. The selenium library provides a headless Chrome web driver to browse through the individual daily URLs.
+
+
+
 ```python
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -15,6 +21,8 @@ opts.add_argument(" --headless")
 chrome_driver = os.getcwd() +"/chromedriver.exe"
 driver = webdriver.Chrome(options=opts, executable_path=chrome_driver)
 ```
+
+to hold each day’s URLs for all SF Chronicle article from January 2021 to the end of September 2021. 
 
 
 ```python
@@ -48,6 +56,8 @@ for url in url_list:
     article_links = article_links.append(temp_df, ignore_index = True)
     print(article_links)
 ```
+![alt text](/images/selenium.png)
+
 
 ```python
 article_links = article_links.drop_duplicates(subset=['URL'])
@@ -55,6 +65,10 @@ article_links['full_url'] = 'https://infoweb.newsbank.com' + article_links['URL'
 urls = article_links['full_url'].tolist()
 print(urls)
 ```
+![alt text](/images/URLS.png)
+
+Newspaper3k is designed to seamlessly extract relevant article information such as the author, posting date, and article body text. 
+
 
 ```python
 rows = []
