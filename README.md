@@ -101,15 +101,27 @@ df = pd.DataFrame(rows)
 ```
 ![alt text](/images/articles.png)
 
-An initial review of the extraction results indicates further processing and cleaning is needed to prepare a final product dataset of individual SF Chronicle articles. 
-Remove the substantively meaningless "Author Byline" and brakets from the Author column
-Seperate out from the "title" column both the name of the piece and the published date
-Clean the article body text by removing line break parameters, 
-View an individual article to check if the additional dataset cleaning was sucessful 
-
+An initial review of the extraction results indicates further processing and cleaning is needed to prepare a final product dataset of individual SF Chronicle articles. Through employing regular expressions within a series of string replacements, splits, and substring extractions, I clean the article body text from line breaks, remove the substantively meaningless "Author Byline" and brackets from the Author column, and seperate out from the "title" column both the name of the artice and the publishing date. I view the first three extracted article to confirm that the additional dataset cleaning was sucessful.
 
 ```python
+articles['text'] = articles['text'].replace(r'\n','', regex=True)
+articles['text'] = articles['text'].replace(r"[\\']",'', regex=True)
+articles['author'] = articles['author'].replace(r"[\'\[\]]","", regex=True)
+articles['author'] = articles['author'].replace(r"Author Byline,","", regex=True)
+display = articles[['author', 'text']].copy()
+
+title = articles['title'].str.split(pat= ', San Francisco Chronicle', expand = True)
+title = title.rename(columns={list(title)[0]:'title', list(title)[1]:'extract'}) 
+date = new['extract'].str.extract(r'((January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}))')
+date = date.rename(columns={list(date)[0]:'drop', list(date)[1]:'month', list(date)[2]:'day'}) 
+title = title[['title']].copy()
+date = date[['month', 'day']].copy()
+
+display = display.join(title).join(date)
+pd.set_option('display.max_colwidth', 1000)
+three = display.iloc[0:3,]
+three
 ```
 ![alt text](/images/clean.png)
 
-
+As these three records indicate, the web scrape starting for an initial headless driver collection of HTML link divs has been fully converted into a working dataset representing the complete digitizal records of the San Francisco Chronicle since the start of 2021. As a next step for my research, I intend on expanding from this initial scrape to build a multi-year corpus to train my own word embedding models on. My own research will examine how stereotypes around race, class, and gender are perpetuated by newspapers as regarding local politics.
